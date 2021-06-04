@@ -10,12 +10,14 @@ let MainForm = (props) => {
     reset,
     submitting
   } = props;
+
+
   return (
     <form onSubmit={handleSubmit}>
       <div>
         <label>Name: </label>
           <Field
-            name="firstName"
+            name="name"
             component="input"
             type="text"
             placeholder="Name"
@@ -27,7 +29,7 @@ let MainForm = (props) => {
       </div>
      <div>
         <label>Type: </label>
-          <Field name="dishType" component="select">
+          <Field name="type" component="select">
             <option />
             <option value="pizza">Pizza</option>
             <option value="soup">Soup</option>
@@ -38,24 +40,24 @@ let MainForm = (props) => {
         <div>
         <div>
           <label>Number of slices: </label>
-          <Field name="no_of_slices" component="input" type="number" />
+          <Field name="no_of_slices" component="input" type="number" parse={newValue => Number.parseInt(newValue)} />
         </div>
         <div>
           <label>Diameter: </label>
-          <Field name="diameter" component="input" type="number" step="0.01" />
+          <Field name="diameter" component="input" type="number" step="0.01" parse={newValue => Number.parseFloat(newValue)}/>
         </div>
         </div>
       )}
       {dishTypeValue === "soup" && (
         <div>
           <label>Spiciness scale: </label>
-          <Field name="spiciness_scale" component="input" type="range" min="1" max="10" step="1" />
+          <Field name="spiciness_scale" component="input" type="range" min="1" max="10" step="1" parse={newValue => Number.parseInt(newValue)}/>
         </div>
       )}
       {dishTypeValue === "sandwich" && (
         <div>
           <label>Slices of bread: </label>
-          <Field name="slices_of_bread" component="input" type="number" />
+          <Field name="slices_of_bread" component="input" type="number" parse={newValue => Number.parseInt(newValue)}/>
         </div>
       )}
       <div>
@@ -76,7 +78,7 @@ MainForm = reduxForm({
 
 const selector = formValueSelector("mainForm");
 MainForm = connect((state) => {
-  const dishTypeValue = selector(state, "dishType");
+  const dishTypeValue = selector(state, "type");
   return {
     dishTypeValue,
   };
