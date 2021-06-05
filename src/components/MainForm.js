@@ -1,6 +1,33 @@
+import { render } from "@testing-library/react";
 import React from "react";
 import { connect } from "react-redux";
-import { Field, reduxForm, formValueSelector } from "redux-form";
+import { Field, reduxForm, formValueSelector, reset } from "redux-form";
+
+const required = value => value ? undefined : 'Required';
+
+const afterSubmit = (result, dispatch) => dispatch(reset('mainForm'));
+
+const renderField = ({ input, label, type, step, min, max, meta: { touched, error } }) => (
+  <div>
+    <label>{label}</label>
+    <div>
+      <input {...input} placeholder={label} type={type} step={step} min={min} max={max}/>
+      {touched && ((error && <span>{error}</span>))}
+    </div>
+  </div>
+)
+
+const renderSelectField = ({ input, label, meta: { touched, error }, children }) => (
+  <div>
+    <label>{label}</label>
+    <div>
+      <select {...input}>
+        {children}
+      </select>
+      {touched && error && <span>{error}</span>}
+    </div>
+  </div>
+)
 
 let MainForm = (props) => {
   const {
@@ -11,53 +38,90 @@ let MainForm = (props) => {
     submitting
   } = props;
 
-
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label>Name: </label>
-          <Field
-            name="name"
-            component="input"
-            type="text"
-            placeholder="Name"
-          />
+        <Field
+          name="name"
+          type="text"
+          component={renderField}
+          label="Name"
+          validate={required}
+        />
       </div>
       <div>
-        <label>Preparation time: </label>
-        <Field name="preparation_time" component="input" type="time" step='1' placeholder="time" />
+        <Field
+          label="Preparation time"
+          name="preparation_time"
+          component={renderField}
+          type="time"
+          step="1"
+          validate={required}
+        />
       </div>
-     <div>
-        <label>Type: </label>
-          <Field name="type" component="select">
-            <option />
-            <option value="pizza">Pizza</option>
-            <option value="soup">Soup</option>
-            <option value="sandwich">Sandwich</option>
-          </Field>
+      <div>
+        <Field
+          name="type"
+          label="Type"
+          component={renderSelectField}
+          validate={required}
+        >
+          <option />
+          <option value="pizza">Pizza</option>
+          <option value="soup">Soup</option>
+          <option value="sandwich">Sandwich</option>
+        </Field>
       </div>
       {dishTypeValue === "pizza" && (
         <div>
-        <div>
-          <label>Number of slices: </label>
-          <Field name="no_of_slices" component="input" type="number" parse={newValue => Number.parseInt(newValue)} />
-        </div>
-        <div>
-          <label>Diameter: </label>
-          <Field name="diameter" component="input" type="number" step="0.01" parse={newValue => Number.parseFloat(newValue)}/>
-        </div>
+          <div>
+            <Field
+              name="no_of_slices"
+              label="Number of slices"
+              component={renderField}
+              type="number"
+              parse={(newValue) => Number.parseInt(newValue)}
+              validate={required}
+            />
+          </div>
+          <div>
+            <Field
+              name="diameter"
+              label="Diameter"
+              component={renderField}
+              type="number"
+              step="any"
+              parse={(newValue) => Number.parseFloat(newValue)}
+              validate={required}
+            />
+          </div>
         </div>
       )}
       {dishTypeValue === "soup" && (
         <div>
-          <label>Spiciness scale: </label>
-          <Field name="spiciness_scale" component="input" type="range" min="1" max="10" step="1" parse={newValue => Number.parseInt(newValue)}/>
+          <Field
+            name="spiciness_scale"
+            label="Spiciness scale"
+            component={renderField}
+            type="range"
+            min="1"
+            max="10"
+            step="1"
+            parse={(newValue) => Number.parseInt(newValue)}
+            validate={required}
+          />
         </div>
       )}
       {dishTypeValue === "sandwich" && (
         <div>
-          <label>Slices of bread: </label>
-          <Field name="slices_of_bread" component="input" type="number" parse={newValue => Number.parseInt(newValue)}/>
+          <Field
+            name="slices_of_bread"
+            label="Slices of bread"
+            component={renderField}
+            type="number"
+            parse={(newValue) => Number.parseInt(newValue)}
+            validate={required}
+          />
         </div>
       )}
       <div>
@@ -73,7 +137,8 @@ let MainForm = (props) => {
 };
 
 MainForm = reduxForm({
-  form: "mainForm"
+  form: "mainForm",
+  onSubmitSuccess: afterSubmit
 })(MainForm);
 
 const selector = formValueSelector("mainForm");
