@@ -7,11 +7,13 @@ export default (async function showResults (data:any) {
       headers: {'Content-Type': 'application/json'},
       body: (`${JSON.stringify(data)}`)
     })
-  
     .then((response) => {
       response.json()
       .then((data) => {
           alert(JSON.stringify(data, null, 2));
       });
+    })
+    .catch(() => {
+        alert('API Connection error')
     })
   });
